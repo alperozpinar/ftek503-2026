@@ -1,0 +1,24 @@
+# Bu repo öğrenciye açılır. Çözüm, not ve öğrenci verisi buraya girmez.
+# Aşağıdaki desenler yanlışlıkla eklemeye karşı ikinci bir güvenlik katmanıdır.
+# Dar tutuldu: "ders-notlari" ya da "cozumlu-ornek" gibi meşru öğrenci dosyalarını engellemez.
+*_cozum.*
+*_cozumler*
+*_solution*
+*cevap-anahtari*
+*not-listesi*
+*ogrenci-verisi*
+cozumler/
+
+# Jupyter / Python
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.env
+
+# Excel geçici ve makro dosyaları
+~$*
+*.xlsm
+
+# macOS / Dropbox
+.DS_Store
+*conflicted copy*
