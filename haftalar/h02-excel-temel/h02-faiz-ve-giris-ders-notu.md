@@ -1,10 +1,10 @@
 # H2 Finansal programlamaya giriş, faiz türleri ve teknik hesaplar (ders notu)
 
-Formüller Türkçe Excel yazımıyla verilir: Türkçe fonksiyon adı, argümanlar arasında noktalı virgül (`;`), ondalık ayırıcı virgül. İngilizce Excel için yanındaki İngilizce yazım kullanılır: İngilizce ad, virgül (`,`), ondalık nokta. Dosya iki dilde de aynı çalışır.
+Formüller İngilizce Excel yazımıyla verilir: İngilizce fonksiyon adı, argümanlar arasında virgül (`,`), ondalık ayırıcı nokta. Türkçe Excel kullanan öğrenci fonksiyonun yerel adını fx düğmesiyle görür. Türkçe yerel ayarda argüman ayracı noktalı virgüldür (`;`), ondalık ayırıcı virgüldür. Dosya iki dilde de aynı çalışır.
 
 Metinde yüzdeler Türkçe yazımla verilir (%40). Excel hücresinde aynı oran yüzde biçimiyle görünür. Ondalık işareti bilgisayarın bölge ayarından gelir. Hücrenin değeri her durumda 0,40'tır.
 
-Bu not `h02-excel-temel.xlsx` dosyasının Faiz ve Uygulama sayfalarıyla, `h02-excel-temel.ipynb` defterinin "Faiz türleri ve teknik hesaplar" ve "Uygulama G3-G4" bölümleriyle birlikte okunur. Nottaki hücre adresleri dosyadakiyle aynıdır. Excel'in temel işlemleri (hücre, formül, başvuru, TOPLA, YUVARLA) ayrı bir notta anlatılır: [H2 Excel temel ders notu](h02-excel-temel-ders-notu.md).
+Bu not `h02-excel-temel.xlsx` dosyasının Faiz ve Uygulama sayfalarıyla, `h02-excel-temel.ipynb` defterinin "Faiz türleri ve teknik hesaplar" ve "Uygulama G3-G4" bölümleriyle birlikte okunur. Nottaki hücre adresleri dosyadakiyle aynıdır. Excel'in temel işlemleri (hücre, formül, başvuru, SUM, ROUND) ayrı bir notta anlatılır: [H2 Excel temel ders notu](h02-excel-temel-ders-notu.md).
 
 **Çalışma sırası:** el kitabının f02 bölümü, bu ders notu, dosyanın Faiz sayfası, Uygulama sayfası (G1, G2), defterin Faiz bölümü ve G3-G4, sonra Excel temel notu ve Hesap, Alistirma, Ileri, Ev sayfaları.
 
@@ -20,13 +20,13 @@ Bu not `h02-excel-temel.xlsx` dosyasının Faiz ve Uygulama sayfalarıyla, `h02-
 7. Nominal ve etkin faiz
 8. Reel faiz
 9. Piyasadaki faizler ve faiz terimleri
-10. GD, BD, ikiye katlanma ve eşit taksitli kredi
+10. FV, PV, ikiye katlanma ve eşit taksitli kredi
 11. Excel'deki Faiz sayfası
 12. Vakanın çözümü
 13. Colab aynası ve Python temelleri
 14. Hızlı şerit (notsuz)
 15. Uygulama görevleri G1-G4
-16. Sık hatalar ve hata mesajları
+16. Tuzaklar ve hatalar
 17. Alıştırma soruları
 18. Özet ve sonraki hafta
 19. Sözlük
@@ -35,13 +35,55 @@ Bu not `h02-excel-temel.xlsx` dosyasının Faiz ve Uygulama sayfalarıyla, `h02-
 
 ---
 
+## Kısaltmalar
+
+Bu notta geçen kısaltmalar, simgeler ve Excel fonksiyon adları aşağıdaki tabloda toplanmıştır. Fonksiyonlar için İngilizce açılım ve Türkçe anlam verilir.
+
+| Kısaltma | Açılımı | Türkçesi | Notta nerede |
+|---|---|---|---|
+| FV | future value | Gelecekteki değer; Excel fonksiyonu | 6, 10 |
+| PV | present value | Bugünkü değer; Excel fonksiyonu | 10, 16 |
+| NPER | number of periods | Dönem sayısı; hedefe kaç dönemde ulaşıldığı | 10 |
+| PMT | payment | Eşit taksit (dönem ödemesi) | 10 |
+| IPMT | interest payment | Bir taksitin faiz payı | 10 |
+| IRR | internal rate of return | İç verim oranı | 10 |
+| NPV | net present value | Net bugünkü değer | 18 |
+| EFFECT | (fonksiyon adı) | Yıllık nominalden yıllık etkin orana | 7, 16 |
+| NOMINAL | (fonksiyon adı) | Yıllık etkinden yıllık nominal orana | 7 |
+| EXP | exponential | e üzeri sayı | 6, 7 |
+| LN | natural logarithm | Doğal logaritma | 10 |
+| SUM, ROUND, MAX | (fonksiyon adları) | Toplam, yuvarlama, en büyük değer | üst bilgi, 11 |
+| RANK.EQ | (fonksiyon adı) | Bir sayının listedeki sırası | 11, 15 |
+| INDEX, MATCH | (fonksiyon adları) | Konumdaki değer; değerin konumu | 11 |
+| EAR | effective annual rate | Yıllık etkin oran | 7 |
+| APR | annual percentage rate | İngilizce kaynaklarda yıllık nominal oran | 7 |
+| pp | percentage point | Yüzde puan | 9, 16 |
+| bp | basis point | Baz puan: 0,01 yüzde puan | 9, 16 |
+| EYFO | Efektif yıllık faiz oranı | Faiz, vergi ve ücretleri içeren yıllık kredi maliyeti | 9, 10 |
+| KKDF | Kaynak Kullanımını Destekleme Fonu | Tüketici kredisinde faize eklenen kesinti | 10 |
+| BSMV | Banka ve Sigorta Muameleleri Vergisi | Tüketici kredisinde faize eklenen vergi | 10 |
+| TCMB | Türkiye Cumhuriyet Merkez Bankası | Merkez bankası | 1, 3, 9 |
+| PPK | Para Politikası Kurulu | TCMB'nin faiz kararını veren kurul | 3, 9 |
+| TÜFE | Tüketici Fiyat Endeksi | Enflasyonun resmî ölçüsü | 3, 8 |
+| TÜİK | Türkiye İstatistik Kurumu | TÜFE'yi yayımlayan kurum | 1, 3 |
+| EVDS | Elektronik Veri Dağıtım Sistemi | TCMB'nin veri servisi | 14 |
+| OECD | Organisation for Economic Co-operation and Development | Ekonomik İşbirliği ve Kalkınma Örgütü | 2 |
+| GFLEC | Global Financial Literacy Excellence Center | Okuryazarlık sorularının kaynağı | 2 |
+| npf | numpy-financial | Excel finans fonksiyonlarının Python karşılıkları | 10, 13 |
+| PRIMM | Predict, Run, Investigate, Modify, Make | Tahmin, Çalıştırma, İnceleme, Değiştirme, Yazma | 13 |
+| P, r, n | (simgeler) | Anapara, dönem faiz oranı, dönem sayısı | 6, 10 |
+| m | (simge) | Yılda kaç kez faiz eklendiği | 7 |
+| i, π | (simgeler) | Nominal faiz, enflasyon | 8 |
+| e | (sabit) | 2,71828...; sürekli bileşiğin tabanı | 6, 7 |
+| [G] [D] [H] [S] [Y] | (etiketler) | Girdi, dönem eşleme, hesap, sağlama, yorum | 4 |
+
 ## 0. Öğrenme hedefleri
 
 Bu hedefler izlencedeki H2 hedeflerini (Excel temel notu) tamamlar.
 
 1. Finansal bir soruyu veri, model, algoritma ve karar adımlarına ayırmak; Excel'in ve Python'un bu zincirdeki rolünü açıklamak.
 2. Basit, bileşik ve sürekli bileşik faizle gelecekteki değeri Excel'de ve Python'da hesaplamak.
-3. Yıllık nominal oranı yıllık etkin orana çevirmek; ETKİN ve NOMİNAL fonksiyonlarını kullanmak; farklı sıklıkla işleyen teklifleri tek ölçüyle karşılaştırmak.
+3. Yıllık nominal oranı yıllık etkin orana çevirmek; EFFECT ve NOMINAL fonksiyonlarını kullanmak; farklı sıklıkla işleyen teklifleri tek ölçüyle karşılaştırmak.
 4. Fisher eşitliğiyle reel faizi hesaplamak ve kısa yolun yüksek oranlarda neden yanılttığını göstermek.
 5. Bugünkü değeri, ikiye katlanma süresini ve 72 kuralını hesaplamak; sonucu ikinci bir yoldan sağlamak.
 6. Basit fonksiyon ve döngüyle (Python) bir faiz tablosu üretmek.
@@ -57,7 +99,7 @@ Bu hedefler izlencedeki H2 hedeflerini (Excel temel notu) tamamlar.
 | Soru | **Aynı %40, üç farklı sonuç: faiz türü neden önemli?** |
 | Neden şimdi? | TCMB Para Politikası Kurulu 10.09.2026'da politika faizini %37'de sabit tutmuştur (https://www.tcmb.gov.tr/wps/wcm/connect/tr/tcmb+tr/main+menu/duyurular/basin/2026/duy2026-38). TÜİK 05.10.2026'da Eylül 2026 yıllık TÜFE'sini %29,73 olarak açıklamıştır (TCMB Tüketici Fiyatları tablosu, erişim 06.10.2026). Haberlerde genellikle tek bir oran yer alır. Oranın türü yazılmadıkça ne kazandırdığı belli olmaz. |
 | Veri ve dağıtım | Elle girilen sayılar, her biri kaynaklı (3. bölüm). Veri dosyası yok. Faiz örneklerindeki oranlar varsayımsaldır. |
-| Excel'de | Faiz sayfası (yedi bölüm) ve Uygulama sayfası (G1, G2): ETKİN, NOMİNAL, GD, BD, ÜS, LN, TAKSİT_SAYISI |
+| Excel'de | Faiz sayfası (yedi bölüm) ve Uygulama sayfası (G1, G2): EFFECT, NOMINAL, FV, PV, EXP, LN, NPER |
 | Colab'da | Defterin "Faiz türleri ve teknik hesaplar" bölümü (ayna) ve G3-G4: fonksiyon, döngü, grafik |
 | Hızlı şerit | EVDS'den TÜFE endeksinin çekilmesi ve yıllık enflasyonun bu endeksten hesaplanması (14. bölüm) |
 | El kitabı | [f02: Yüzde, oran ve faiz](../../finans-temeli/f02-yuzde-ve-faiz.md) |
@@ -141,10 +183,10 @@ Bu sorular kolay görünür, ancak sık yanlış cevaplanır. OECD'nin yetişkin
 
 Isınmanın iki hesabı dosyada Faiz sayfasının başında durur.
 
-| Blok | Hücre | Türkçe Excel | İngilizce | Sonuç |
-|---|---|---|---|---|
-| Soru 1 | Faiz!B22 | `=B19*(1+B20)^B21` | aynı | 110,41 TL |
-| Soru 2 | Faiz!B27 | `=(1+B25)/(1+B26)-1` | aynı | -%0,98 |
+| Blok | Hücre | Excel | Sonuç |
+|---|---|---|---|
+| Soru 1 | Faiz!B22 | `=B19*(1+B20)^B21` | 110,41 TL |
+| Soru 2 | Faiz!B27 | `=(1+B25)/(1+B26)-1` | -%0,98 |
 
 **Pratik.** Finans sayfasındaki notsuz finans alıştırması (yüzde değişim, aylık %4) Excel temel notunun 2. bölümünde anlatılmaktadır.
 
@@ -183,7 +225,7 @@ Bu hafta için veri dosyası yoktur. Her gerçek sayı, kaynağı ve tarihiyle a
 
 **Tanım.** Bu derste finansal programlama (financial programming), finansal bir soruyu veri, model, algoritma ve karar zincirine çevirip bilgisayarda tekrarlanabilir biçimde çözmektir. Veri: tutar, oran, süre, piyasa serisi. Model: formül. Algoritma: adımlar ve döngüler. Karar: hangi teklif, ne kadar süre, hangi varsayımla.
 
-**Sezgi.** Hesap makinesiyle 100.000 × 1,4^3 bir kez bulunabilir. Oran %35 olduğunda ya da 60 farklı oran denendiğinde aynı hesabın her seferinde yeniden yapılması gerekir. Bu durumda hesabı bir kez kuran ve girdi değişince yeniden çalışan bir yapı gerekir. Finansal programlama bu yapının kurulmasıdır.
+**Sezgi.** Hesap makinesiyle 100.000 × 1,4^3 bir kez bulunabilir. 60 farklı oran denendiğinde ise hesabı bir kez kuran ve girdi değişince yeniden çalışan bir yapı gerekir. Finansal programlama bu yapının kurulmasıdır.
 
 ```mermaid
 flowchart LR
@@ -199,13 +241,11 @@ flowchart LR
 ```
 
 **İki aracın rolü.**
-- **Excel.** Excel modelin görünür halidir. Her girdi bir hücrede, her ilişki bir formülde durur ve formül çubuğundan okunur. Küçük bir modeli kurmak ve başkasına göstermek için güçlü bir araçtır.
+- **Excel.** Excel modelin görünür halidir. Her girdi bir hücrede, her ilişki bir formülde durur ve formül çubuğundan okunur.
 - **Python.** Python (Colab) ölçek, tekrar ve otomasyon içindir. Aynı formül 1 yerine 1.000 senaryoda, 3 yıl yerine 20 yıllık veride çalışır.
-- **Sağlama.** Sağlama iki aracı bağlar: aynı sonuç iki yoldan bulunur ve iki sonucun farkı alınır. Fark sıfır değilse bir yerde hata vardır.
+- **Sağlama.** Sağlama iki aracı bağlar: aynı sonuç iki yoldan bulunur ve iki sonucun farkı alınır. Fark sıfır değilse bir yerde hata vardır. Bu, izlencede vizeyle değerlendirilen Ö1 öğrenme çıktısının da parçasıdır.
 
-**İki aracın birlikte kullanılması.** Excel'de hata görmek kolaydır, ancak 1.000 satırlık bir tabloyu elle sürüklemek ve her ay yeni veriyle yeniden kurmak zordur. Python'da tekrar kolaydır, ancak ara adımlar gözden kaçabilir. Bu derste her vaka iki yoldan kurulur ve yollardan biri ötekinin sağlamasıdır. Sonucun ikinci bir yoldan sağlanması, izlencede vizeyle değerlendirilen Ö1 öğrenme çıktısının da parçasıdır.
-
-**Dersin vaka modeli.** Her içerik haftası bir vakaya bağlıdır: tek cümlelik soru, kaynaklı güncel kanca, gerçek veri. H2-H5'te Excel çekirdektir, Colab aynı vakanın aynasıdır. H6-H13'te sıra tersine döner. Dosyalarda her adım bir etiket taşır: [G] girdiler, [D] dönem ve oran eşleme, [H] hesap, [S] sağlama, [Y] yorum. [İ] işaret adımı H3'te eklenir.
+**Dersin vaka modeli.** Her içerik haftası bir vakaya bağlıdır. H2-H5'te Excel çekirdektir, Colab aynı vakanın aynasıdır; H6-H13'te sıra tersine döner. Dosyalarda her adım bir etiket taşır: [G] girdiler, [D] dönem ve oran eşleme, [H] hesap, [S] sağlama, [Y] yorum. [İ] işaret adımı H3'te eklenir.
 
 **Sayılı örnek (varsayımsal oranlar).** 100.000 TL, 3 yıl, yıllık bileşik; oran %10, %20, %30, %40. Formül tektir: `anapara × (1 + oran)^yıl`. Excel'de formül bir kez yazılıp dört satıra sürüklenir. Python'da dört elemanlı bir liste üzerinde döngü kurulur.
 
@@ -220,7 +260,9 @@ for oran in [0.10, 0.20, 0.30, 0.40]:
 # 0.4 274400.0
 ```
 
-**Sık hata.** Bu hata, formüle sayı gömmektir (`=B31*(1+0,4)^3`). Bu durumda girdi değişince sonuç değişmez ve model "programlanmış" olmaz. Her sayı bir girdi hücresinde durur.
+**Nerede kullanılır.** Kredi ve mevduat tekliflerinin karşılaştırılması, yatırım kararları ve her ay yeni veriyle güncellenen finansal raporlar bu zincirle kurulur.
+
+**Sık hata.** Bu hata, formüle sayı gömmektir (`=B31*(1+0.4)^3`). Bu durumda girdi değişince sonuç değişmez ve model "programlanmış" olmaz. Her sayı bir girdi hücresinde durur.
 
 > **Tahmin sorusu:** r = %1, %2, ..., %60 için bir ikiye katlanma süresi tablosu kurulacaktır. Bu iş için Excel mi, Python mı uygundur?
 >
@@ -246,16 +288,18 @@ for oran in [0.10, 0.20, 0.30, 0.40]:
 
 **Excel'de.**
 
-| Etiket | Hücre | Türkçe Excel | İngilizce | Sonuç |
-|---|---|---|---|---|
-| [G] | Faiz!B31 | anapara (mavi) | | 100.000 TL |
-| [G] | Faiz!B32 | yıllık nominal oran (mavi) | | %40 |
-| [D] | | oran yıllık, süre yıl: eşleşir | | |
-| [H] | Faiz!F50 | `=$B$31*(1+D50)` | aynı | **140.000,00 TL** |
-| [H] | Faiz!B101 | `=B98/(1+B32)^B99` | aynı | **71.428,57 TL** |
-| [Y] | | Bir yıl beklemenin bedeli %40 ise bir yıl sonraki 100.000 TL bugün 71.428,57 TL eder. | | |
+| Etiket | Hücre | Excel | Sonuç |
+|---|---|---|---|
+| [G] | Faiz!B31 | anapara (mavi) | 100.000 TL |
+| [G] | Faiz!B32 | yıllık nominal oran (mavi) | %40 |
+| [D] |  | oran yıllık, süre yıl: eşleşir |  |
+| [H] | Faiz!F50 | `=$B$31*(1+D50)` | **140.000,00 TL** |
+| [H] | Faiz!B101 | `=B98/(1+B32)^B99` | **71.428,57 TL** |
+| [Y] |  | Bir yıl beklemenin bedeli %40 ise bir yıl sonraki 100.000 TL bugün 71.428,57 TL eder. |  |
 
 **Python'da.** Defterin "Faiz türleri ve teknik hesaplar" bölümünün ilk kod hücresi girdileri tanımlar: `P = 100000`, `r = 0.40`, `n = 3`. Bir yıllık faiz `P * r`, üç aylık faiz `P * r * 3 / 12` ile hesaplanır.
+
+**Nerede kullanılır.** Faiz her borç ilişkisinin fiyatıdır: mevduat, kredi ve tahvil. Paranın zaman değeri de değerleme ve yatırım kararı gibi bugünle geleceği karşılaştıran her hesabın temelidir.
 
 **Sık hata.** Bu hata, oranın dönemine bakmadan oranı süreyle çarpmaktır. "Aylık %3" bir oranı 3 yıl ile çarpmak anlamsızdır. Önce oran ile sürenin birimi eşlenir ([D] adımı).
 
@@ -282,18 +326,18 @@ for oran in [0.10, 0.20, 0.30, 0.40]:
 
 **Excel'de.** Faiz sayfası, 2. bölüm (satır 36-45). Ortak girdiler B31 (100.000 TL), B32 (%40) ve B33 (3 yıl) hücrelerindedir.
 
-| Etiket | Hücre | Türkçe Excel | İngilizce | Sonuç |
-|---|---|---|---|---|
-| [D] | | oran yıllık (B32), süre yıl (B33) | | |
-| [H] Basit | Faiz!B38 | `=B31*(1+B32*B33)` | aynı | **220.000,00 TL** |
-| [H] Yıllık bileşik | Faiz!B39 | `=B31*(1+B32)^B33` | aynı | **274.400,00 TL** |
-| [H] GD ile | Faiz!B40 | `=GD(B32;B33;0;-B31)` | `=FV(B32,B33,0,-B31)` | 274.400,00 TL |
-| [H] Sürekli | Faiz!B41 | `=B31*ÜS(B32*B33)` | `=B31*EXP(B32*B33)` | **332.011,69 TL** |
-| [H] Faizin faizi | Faiz!B42 | `=B39-B38` | aynı | 54.400,00 TL |
-| [H] Sürekli fazlası | Faiz!B43 | `=B41-B39` | aynı | 57.611,69 TL |
-| [S] | Faiz!B44 | `=B39-B40` | aynı | 0,000000 |
+| Etiket | Hücre | Excel | Sonuç |
+|---|---|---|---|
+| [D] |  | oran yıllık (B32), süre yıl (B33) |  |
+| [H] Basit | Faiz!B38 | `=B31*(1+B32*B33)` | **220.000,00 TL** |
+| [H] Yıllık bileşik | Faiz!B39 | `=B31*(1+B32)^B33` | **274.400,00 TL** |
+| [H] FV ile | Faiz!B40 | `=FV(B32,B33,0,-B31)` | 274.400,00 TL |
+| [H] Sürekli | Faiz!B41 | `=B31*EXP(B32*B33)` | **332.011,69 TL** |
+| [H] Faizin faizi | Faiz!B42 | `=B39-B38` | 54.400,00 TL |
+| [H] Sürekli fazlası | Faiz!B43 | `=B41-B39` | 57.611,69 TL |
+| [S] | Faiz!B44 | `=B39-B40` | 0,000000 |
 
-ÜS (EXP), e üzeri sayıyı verir: `ÜS(1,2)` = e^1,2. ÜS bir fonksiyondur ve Excel'deki `^` işleciyle aynı şey değildir.
+`EXP` (exponential, üstel), e üzeri sayıyı verir: `EXP(1.2)` = e^1,2. `EXP` bir fonksiyondur ve Excel'deki `^` işleciyle aynı şey değildir.
 
 ![100.000 TL, yıllık %40 ile 0-3 yıl: basit doğru gibi, yıllık bileşik ve sürekli bileşik eğri gibi büyür; 3. yıl sonunda 220.000, 274.400 ve 332.011,69 TL.](gorseller/h02-faiz-buyume-turleri.png)
 
@@ -306,10 +350,12 @@ import math
 P, r, n = 100000, 0.40, 3        # Excel Faiz!B31, B32, B33
 basit = P * (1 + r * n)           # Faiz!B38
 bilesik = P * (1 + r) ** n        # Faiz!B39
-surekli = P * math.exp(r * n)     # Faiz!B41, ÜS = math.exp
+surekli = P * math.exp(r * n)     # Faiz!B41, EXP = math.exp
 print(f"{basit:,.2f}  {bilesik:,.2f}  {surekli:,.2f}")
 # 220,000.00  274,400.00  332,011.69
 ```
+
+**Nerede kullanılır.** Basit faiz kısa vadeli işlemlerde (gün esaslı mevduat faizi, repo, senet iskontosu), bileşik faiz birikim, kredi ve yatırım hesaplarında kullanılır. Sürekli bileşik banka ürünlerinde yoktur; türev fiyatlamada, teorik finansta ve log getiride kullanılır.
 
 **Sık hata.** Bu hata, üs yerine çarpma kullanmaktır. `=B31*(1+B32)*B33` 420.000 TL verir ve bu sonuç ne basit ne bileşik faizdir. Bileşik faizde süre üs olarak yazılır: `^B33`.
 
@@ -321,7 +367,7 @@ print(f"{basit:,.2f}  {bilesik:,.2f}  {surekli:,.2f}")
 
 ## 7. Nominal ve etkin faiz
 
-**Tanım.** Yıllık nominal oran (nominal annual rate), dönem oranı ile yılda dönem sayısının çarpımıdır ve ilanlarda ve sözleşmelerde yazan orandır. Yıllık etkin oran (effective annual rate) paranın bir yılda gerçekte ne kadar büyüdüğünü gösterir. Faizin yılda kaç kez eklendiğine bileşiklenme sıklığı (compounding frequency) denir ve m ile gösterilir.
+**Tanım.** Yıllık nominal oran (nominal annual rate), dönem oranı ile yılda dönem sayısının çarpımıdır ve ilanlarda ve sözleşmelerde yazan orandır. Yıllık etkin oran (effective annual rate, EAR) paranın bir yılda gerçekte ne kadar büyüdüğünü gösterir. İngilizce kaynaklarda yıllık nominal oran çoğu zaman APR (annual percentage rate) adıyla geçer. Faizin yılda kaç kez eklendiğine bileşiklenme sıklığı (compounding frequency) denir ve m ile gösterilir.
 
 **Dönem dönüşümleri.**
 - Yıllık nominal r, yılda m dönem: dönem oranı = r / m.
@@ -338,42 +384,44 @@ print(f"{basit:,.2f}  {bilesik:,.2f}  {surekli:,.2f}")
 
 **Excel'de.** Faiz sayfası, 3. bölüm (satır 47-58) ve 4. bölüm (satır 60-71).
 
-| Etiket | Hücre | Türkçe Excel | İngilizce | Sonuç |
-|---|---|---|---|---|
-| [H] m = 12, dönem oranı | Faiz!C53 | `=$B$32/B53` | aynı | %3,3333 |
-| [H] m = 1 | Faiz!D50 | `=(1+C50)^B50-1` | aynı | %40,0000 |
-| [H] m = 2 | Faiz!D51 | aynı kalıp | aynı | %44,0000 |
-| [H] m = 4 | Faiz!D52 | aynı kalıp | aynı | %46,4100 |
-| [H] m = 12 | Faiz!D53 | aynı kalıp | aynı | **%48,2126** |
-| [H] ETKİN ile | Faiz!E53 | `=ETKİN($B$32;B53)` | `=EFFECT($B$32,B53)` | %48,2126 |
-| [H] Sürekli sınır | Faiz!D54 | `=ÜS($B$32)-1` | `=EXP($B$32)-1` | **%49,1825** |
-| [H] Sürekli - aylık | Faiz!B57 | `=(D54-D53)*B34` | aynı | 0,97 puan |
-| [S] | Faiz!B55 | `=D53-E53` | aynı | 0,000000 |
-| [H] Aylık %3, nominal | Faiz!B64 | `=B61*B62` | aynı | %36,0000 |
-| [H] Aylık %3, etkin | Faiz!B65 | `=(1+B61)^B62-1` | aynı | **%42,5761** |
-| [H] Geri nominal | Faiz!B67 | `=NOMİNAL(B65;B62)` | `=NOMINAL(B65,B62)` | %36,0000 |
-| [H] Faizin faizi | Faiz!B68 | `=(B65-B64)*B34` | aynı | 6,58 puan |
+| Etiket | Hücre | Excel | Sonuç |
+|---|---|---|---|
+| [H] m = 12, dönem oranı | Faiz!C53 | `=$B$32/B53` | %3,3333 |
+| [H] m = 1 | Faiz!D50 | `=(1+C50)^B50-1` | %40,0000 |
+| [H] m = 2 | Faiz!D51 | aynı kalıp | %44,0000 |
+| [H] m = 4 | Faiz!D52 | aynı kalıp | %46,4100 |
+| [H] m = 12 | Faiz!D53 | aynı kalıp | **%48,2126** |
+| [H] EFFECT ile | Faiz!E53 | `=EFFECT($B$32,B53)` | %48,2126 |
+| [H] Sürekli sınır | Faiz!D54 | `=EXP($B$32)-1` | **%49,1825** |
+| [H] Sürekli - aylık | Faiz!B57 | `=(D54-D53)*B34` | 0,97 puan |
+| [S] | Faiz!B55 | `=D53-E53` | 0,000000 |
+| [H] Aylık %3, nominal | Faiz!B64 | `=B61*B62` | %36,0000 |
+| [H] Aylık %3, etkin | Faiz!B65 | `=(1+B61)^B62-1` | **%42,5761** |
+| [H] Geri nominal | Faiz!B67 | `=NOMINAL(B65,B62)` | %36,0000 |
+| [H] Faizin faizi | Faiz!B68 | `=(B65-B64)*B34` | 6,58 puan |
 
 ![Yıllık nominal %40 için yıllık etkin oran: m = 1'de %40, m = 2'de %44, m = 4'te %46,41, m = 12'de %48,21; sürekli bileşik sınırı %49,18.](gorseller/h02-faiz-bilesiklenme-sikligi.png)
 
 *Grafiğin yorumu.* Her sıklık artışı etkin oranı yükseltir, ancak artış giderek küçülür. Eğri %49,18'lik sınıra yaklaşır ve bu sınırı geçmez. Haftalık ve günlük satırlar G1 görevinde eklenir.
 
-**Python'da.** Defterdeki karşılığı "[H] Nominal ve etkin: ETKİN ve NOMİNAL'in Python karşılığı" bölümüdür. numpy-financial'da ETKİN'in karşılığı yoktur ve formül açık yazılır.
+**Python'da.** Defterdeki karşılığı "[H] Nominal ve etkin" bölümüdür. numpy-financial'da `EFFECT` ve `NOMINAL`'in karşılığı yoktur ve formül açık yazılır.
 
 ```python
 aylik, m = 0.03, 12                        # Faiz!B61, B62
 nominal = aylik * m                        # Faiz!B64
-etkin = (1 + aylik) ** m - 1               # Faiz!B65 ve ETKİN
-geri = m * ((1 + etkin) ** (1 / m) - 1)    # NOMİNAL
+etkin = (1 + aylik) ** m - 1               # Faiz!B65 ve EFFECT
+geri = m * ((1 + etkin) ** (1 / m) - 1)    # NOMINAL
 print(round(nominal, 4), round(etkin, 6), round(geri, 4))
 # 0.36 0.425761 0.36
 ```
 
-**Sık hata.** ETKİN dönem sayısını tam sayıya keser (Microsoft belgesi). Vade gün olarak verildiğinde yılda dönem sayısı tam sayı çıkmayabilir. Bu durumda `=(1+dönem_oranı)^m-1` formülü kullanılır.
+**Nerede kullanılır.** Farklı vade ve sıklıktaki mevduat ve kredi teklifleri ancak yıllık etkin orana çevrilince karşılaştırılabilir.
+
+**Sık hata.** `EFFECT`'e aylık oran verilmesi ya da m'nin tam sayı olmaması yanlış sonuç verir; o durumda `=(1+dönem_oranı)^m-1` kullanılır (16. bölüm, T3).
 
 > **Tahmin sorusu:** m sonsuza giderse yıllık etkin oran da sonsuza mı gider?
 >
-> <details><summary>Cevap</summary>Gitmez. (1 + r/m)^m, e^r'ye yaklaşır. Yıllık %40 için sınır <code>=ÜS(B32)-1</code> = %49,18'dir (Faiz!D54).</details>
+> <details><summary>Cevap</summary>Gitmez. (1 + r/m)^m, e^r'ye yaklaşır. Yıllık %40 için sınır <code>=EXP(B32)-1</code> = %49,18'dir (Faiz!D54).</details>
 
 ---
 
@@ -394,16 +442,16 @@ print(round(nominal, 4), round(etkin, 6), round(geri, 4))
 
 **Excel'de.** Faiz sayfası, 5. bölüm (satır 73-83). Politika faizi ve TÜFE resmî kaynaktan alınmıştır. Kaynak bağlantıları B74 ve B75'in hücre notlarında yer alır.
 
-| Etiket | Hücre | Türkçe Excel | İngilizce | Sonuç |
-|---|---|---|---|---|
-| [G] | Faiz!B74 | politika faizi (mavi) | | %37 |
-| [G] | Faiz!B75 | yıllık TÜFE, Eylül 2026 (mavi) | | %29,73 |
-| [H] Fisher | Faiz!B77 | `=(1+B74)/(1+B75)-1` | aynı | **%5,60** |
-| [H] Kısa yol | Faiz!B78 | `=(B74-B75)*B34` | aynı | 7,27 puan |
-| [H] Kısa yolun fazlası | Faiz!B79 | `=B78-B77*B34` | aynı | 1,67 puan |
-| [H] Ağustos TÜFE'siyle | Faiz!B80 | `=(1+B74)/(1+B76)-1` | aynı | %4,17 |
-| [S] | Faiz!B81 | `=(1+B77)*(1+B75)-(1+B74)` | aynı | 0,000000 |
-| [Y] | | Faiz aynı kalmış, enflasyon düşmüştür. Reel faiz Ağustos'tan Eylül'e yükselmiştir. | | |
+| Etiket | Hücre | Excel | Sonuç |
+|---|---|---|---|
+| [G] | Faiz!B74 | politika faizi (mavi) | %37 |
+| [G] | Faiz!B75 | yıllık TÜFE, Eylül 2026 (mavi) | %29,73 |
+| [H] Fisher | Faiz!B77 | `=(1+B74)/(1+B75)-1` | **%5,60** |
+| [H] Kısa yol | Faiz!B78 | `=(B74-B75)*B34` | 7,27 puan |
+| [H] Kısa yolun fazlası | Faiz!B79 | `=B78-B77*B34` | 1,67 puan |
+| [H] Ağustos TÜFE'siyle | Faiz!B80 | `=(1+B74)/(1+B76)-1` | %4,17 |
+| [S] | Faiz!B81 | `=(1+B77)*(1+B75)-(1+B74)` | 0,000000 |
+| [Y] |  | Faiz aynı kalmış, enflasyon düşmüştür. Reel faiz Ağustos'tan Eylül'e yükselmiştir. |  |
 
 **Python'da.** Defterdeki karşılığı "[H] Reel faiz" bölümüdür.
 
@@ -414,12 +462,11 @@ print(f"{reel:.2%}", round((politika - tufe) * 100, 2))
 # 5.60% 7.27
 ```
 
-> [!WARNING]
-> **Kısa yolun yüksek oranlardaki hatası.** "Faiz eksi enflasyon" düşük oranlarda Fisher'e yakındır. Oranlar %30-40 düzeyindeyken fark puanlarla ölçülür. Eylül 2026'da bu fark 1,67 puandır.
+**Sınır.** Bu ölçü geriye dönüktür: son 12 ayın enflasyonuyla bugünün faizini karşılaştırır (16. bölüm, T5). Politika faizi mevduat ya da kredi faizi değildir (T6).
 
-**Sınır.** Bu ölçü geriye dönüktür: son 12 ayın enflasyonuyla bugünün faizini karşılaştırır. İleriye dönük reel faiz için beklenen enflasyon gerekir (H4, el kitabı f04). Politika faizi mevduat ya da kredi faizi değildir.
+**Nerede kullanılır.** Reel faiz para politikasının sıkı mı gevşek mi olduğunu değerlendirmek ve bir birikimin ya da yatırımın alım gücünü gerçekten artırıp artırmadığını ölçmek için kullanılır.
 
-**Sık hata.** Reel faizi "nominal / enflasyon" diye bölmek (1,37 / 0,2973) anlamsız bir sayı verir. Bölme (1 + ...) terimleri arasında yapılır.
+**Sık hata.** Reel faizi "nominal / enflasyon" diye bölmek (1,37 / 0,2973) anlamsız bir sayı verir. Bölme (1 + ...) terimleri arasında yapılır (16. bölüm, T4).
 
 > **Tahmin sorusu:** Eylül 2026 için kısa yol mu, Fisher mi daha büyük bir reel faiz gösterir?
 >
@@ -443,28 +490,30 @@ Aşağıdaki tablo bu dersin kullandığı adları özetler.
 | **Değişken faiz** (floating rate) | Bir referans orana bağlıdır, belirli tarihlerde yeniden belirlenir | bu bölüm |
 | **İskonto oranı** (discount rate) | Gelecekteki tutarı bugüne taşırken kullanılan oran | 10. bölüm, H3 |
 
-**Sezgi.** Kısa vadeli mevduatı her vade sonunda yenilemek, faizi fiilen değişken yapar, çünkü yenileme günündeki oran bugünküyle aynı olmayabilir. G2'deki "aynı koşulla yenileme" varsayımı bu yüzden açıkça yazılır.
+**Sezgi.** Kısa vadeli mevduatı her vade sonunda yenilemek faizi fiilen değişken yapar, çünkü yenileme günündeki oran bugünküyle aynı olmayabilir (16. bölüm, T10).
 
-**Sabit ve değişken, sayılı örnek (varsayımsal).** 100.000 TL, 2 yıl, yıllık bileşik. Sabit %40: 100.000 × 1,40 × 1,40 = 196.000 TL. Değişken: ilk yıl %40, ikinci yıl oran %30'a iner: 100.000 × 1,40 × 1,30 = 182.000 TL. Excel'de değişken faiz için her yılın oranı ayrı bir hücrede durur ve formül bir çarpım zinciri olur: `=B1*(1+B2)*(1+B3)`. Python'da oranlar bir listede durur ve döngüyle çarpılır. Gelecek dönemin oranı bugünden bilinmez. Değişken faizde sonuç bir senaryodur.
+**Sabit ve değişken, sayılı örnek (varsayımsal).** 100.000 TL, 2 yıl, yıllık bileşik. Sabit %40: 100.000 × 1,40 × 1,40 = 196.000 TL. Değişken: ilk yıl %40, ikinci yıl oran %30'a iner: 100.000 × 1,40 × 1,30 = 182.000 TL. Excel'de değişken faiz için her yılın oranı ayrı bir hücrede durur ve formül bir çarpım zinciri olur: `=B1*(1+B2)*(1+B3)`. Gelecek dönemin oranı bugünden bilinmez. Değişken faizde sonuç bir senaryodur.
 
-**Yüzde, yüzde puan, baz puan.** İki oranın farkı yüzde puandır (percentage point). 1 puan = 100 baz puan (basis point).
+**Yüzde, yüzde puan, baz puan.** İki oranın farkı yüzde puandır (percentage point, pp). 1 puan = 100 baz puan (basis point, bp).
 
 **Sayılı örnek.** PPK 22.01.2026'da politika faizini %38'den %37'ye indirmiştir (TCMB duyurusu 2026-01).
 1. Fark: 37 - 38 = -1 puan = -100 baz puan.
 2. Oransal değişim: 37 / 38 - 1 = -%2,63.
-3. "Faiz %1 düştü" cümlesi bu yüzden belirsizdir, çünkü 1 puanı da %1'lik oransal düşüşü de ifade edebilir.
+3. "Faiz %1 düştü" cümlesi bu yüzden belirsizdir (16. bölüm, T7).
 
 **Excel'de.** Bu hesap için Faiz sayfasında hücre yoktur. Boş bir sayfada A1'e 0,38, A2'ye 0,37 yazılır.
 
-| Ne | Türkçe Excel | İngilizce | Sonuç |
-|---|---|---|---|
-| Puan | `=(A2-A1)*100` | aynı | -1 |
-| Baz puan | `=(A2-A1)*10000` | aynı | -100 |
-| Oransal değişim | `=A2/A1-1` | aynı | -%2,63 |
+| Ne | Excel | Sonuç |
+|---|---|---|
+| Puan | `=(A2-A1)*100` | -1 |
+| Baz puan | `=(A2-A1)*10000` | -100 |
+| Oransal değişim | `=A2/A1-1` | -%2,63 |
 
 Gerçek modelde 100 ve 10.000 de birer hücrede durur (Faiz!B34 gibi).
 
 **Python'da.** `round((0.37 - 0.38) * 10000)` -100 verir. `round(...)` olmadan Python -100.00000000000009 yazar, çünkü ondalık sayılar yaklaşık tutulur (Excel temel notu, 13. bölüm).
+
+**Nerede kullanılır.** Politika faizi para politikası haberlerinde ve reel faiz hesabında, EYFO kredi tekliflerinin karşılaştırılmasında kullanılır. Yüzde puan ve baz puan merkez bankası kararlarının ve faiz haberlerinin dilidir.
 
 **Sık hata.** Bu hata, akdi faizle EYFO'yu karıştırmaktır. İki kredinin akdi faizi aynı olsa da ücreti yüksek olanın EYFO'su yüksektir.
 
@@ -474,57 +523,59 @@ Gerçek modelde 100 ve 10.000 de birer hücrede durur (Faiz!B34 gibi).
 
 ---
 
-## 10. GD, BD, ikiye katlanma ve eşit taksitli kredi
+## 10. FV, PV, ikiye katlanma ve eşit taksitli kredi
 
-**Tanım.** Gelecekteki değer (future value, GD), bugünkü tutarın faizle ulaşacağı tutardır. Bugünkü değer (present value, BD), gelecekteki bir tutarın bugünkü karşılığıdır. BD bileşik faizin tersidir ve bu işleme iskonto denir. İkiye katlanma süresi, (1 + r)^T = 2 denkleminin çözümüdür: T = LN(2) / LN(1 + r). 72 kuralı (rule of 72) bunun pratik yaklaşığıdır: T ≈ 72 / (yüzde olarak oran).
+**Tanım.** Gelecekteki değer (future value, FV), bugünkü tutarın faizle ulaşacağı tutardır. Bugünkü değer (present value, PV), gelecekteki bir tutarın bugünkü karşılığıdır. PV bileşik faizin tersidir ve bu işleme iskonto denir. İkiye katlanma süresi, (1 + r)^T = 2 denkleminin çözümüdür: T = LN(2) / LN(1 + r). 72 kuralı (rule of 72) bunun pratik yaklaşığıdır: T ≈ 72 / (yüzde olarak oran).
 
 Bu haftanın bütün teknik formülleri aşağıdaki tabloda toplanmıştır.
 
 | Hesap | Formül | Excel |
 |---|---|---|
-| GD, yıllık bileşik | `P × (1 + r)^n` | GD (FV) |
-| GD, yılda m kez | `P × (1 + r/m)^(m × n)` | `^` ile |
-| Yıllık etkin | `(1 + r/m)^m - 1` | ETKİN (EFFECT) |
-| Sürekli | `P × e^(r × n)` | ÜS (EXP) |
-| BD | `GD / (1 + r)^n` | BD (PV) |
-| İkiye katlanma | `LN(2) / LN(1 + r)` | TAKSİT_SAYISI (NPER), LN |
+| FV, yıllık bileşik | `P × (1 + r)^n` | `FV` |
+| FV, yılda m kez | `P × (1 + r/m)^(m × n)` | `^` ile |
+| Yıllık etkin | `(1 + r/m)^m - 1` | `EFFECT` |
+| Sürekli | `P × e^(r × n)` | `EXP` |
+| PV | `FV / (1 + r)^n` | `PV` |
+| İkiye katlanma | `LN(2) / LN(1 + r)` | `NPER`, `LN` |
 | Reel getiri | `(1 + i) / (1 + π) - 1` | formül |
 
-**Sezgi.** BD, bir yıl sonra 100.000 TL'ye ulaşmak için bugün yatırılması gereken tutarı verir. İkiye katlanma süresi ise büyümeyi tek bir sayıyla anlatır ve paranın bu oranla kaç yılda iki katına çıktığını gösterir.
+**Sezgi.** PV, bir yıl sonra 100.000 TL'ye ulaşmak için bugün yatırılması gereken tutarı verir. İkiye katlanma süresi ise paranın bu oranla kaç yılda iki katına çıktığını gösterir.
 
 **Sayılı örnek (varsayımsal).** Yıllık %10.
-1. GD: 1.000 TL, 2 yıl: 1.000 × 1,1^2 = 1.210 TL.
-2. BD: 2 yıl sonraki 1.210 TL bugün 1.210 / 1,21 = 1.000 TL eder.
+1. FV: 1.000 TL, 2 yıl: 1.000 × 1,1^2 = 1.210 TL.
+2. PV: 2 yıl sonraki 1.210 TL bugün 1.210 / 1,21 = 1.000 TL eder.
 3. İkiye katlanma: LN(2) / LN(1,1) = 0,6931 / 0,0953 = 7,27 yıl. 72 kuralı 72 / 10 = 7,2 yıl verir.
 
 **Excel'de.** Faiz sayfası, 6. bölüm (satır 85-95) ve 7. bölüm (satır 97-105).
 
-| Etiket | Hücre | Türkçe Excel | İngilizce | Sonuç |
-|---|---|---|---|---|
-| [H] Tam süre | Faiz!B89 | `=TAKSİT_SAYISI(B32;0;-1;B86)` | `=NPER(B32,0,-1,B86)` | **2,0600** |
-| [H] LN ile | Faiz!B90 | `=LN(B86)/LN(1+B32)` | aynı | 2,0600 |
-| [H] 72 kuralı | Faiz!B91 | `=B87/(B32*B34)` | aynı | 1,8000 |
-| [H] Kuralın hatası | Faiz!B92 | `=B91-B90` | aynı | -0,26 |
-| [S] | Faiz!B93 | `=B89-B90` | aynı | 0,000000 |
-| [H] BD, formülle | Faiz!B101 | `=B98/(1+B32)^B99` | aynı | **71.428,57 TL** |
-| [H] BD ile | Faiz!B102 | `=BD(B32;B99;0;-B98)` | `=PV(B32,B99,0,-B98)` | 71.428,57 TL |
-| [S] | Faiz!B103 | `=B102*(1+B32)^B99-B98` | aynı | 0,000000 |
+| Etiket | Hücre | Excel | Sonuç |
+|---|---|---|---|
+| [H] Tam süre | Faiz!B89 | `=NPER(B32,0,-1,B86)` | **2,0600** |
+| [H] LN ile | Faiz!B90 | `=LN(B86)/LN(1+B32)` | 2,0600 |
+| [H] 72 kuralı | Faiz!B91 | `=B87/(B32*B34)` | 1,8000 |
+| [H] Kuralın hatası | Faiz!B92 | `=B91-B90` | -0,26 |
+| [S] | Faiz!B93 | `=B89-B90` | 0,000000 |
+| [H] PV, formülle | Faiz!B101 | `=B98/(1+B32)^B99` | **71.428,57 TL** |
+| [H] PV ile | Faiz!B102 | `=PV(B32,B99,0,-B98)` | 71.428,57 TL |
+| [S] | Faiz!B103 | `=B102*(1+B32)^B99-B98` | 0,000000 |
 
-TAKSİT_SAYISI şöyle okunur. Bugün 1 TL yatırılır ve para cepten çıktığı için eksi girilir. Ara ödeme yoktur (0). Fonksiyon, B86 = 2 TL'ye kaç dönemde ulaşıldığını verir. Oran yıllık olduğu için sonuç yıl cinsindendir.
+`NPER` (number of periods, dönem sayısı) şöyle okunur. Bugün 1 TL yatırılır ve para cepten çıktığı için eksi girilir. Ara ödeme yoktur (0). Fonksiyon, B86 = 2 TL'ye kaç dönemde ulaşıldığını verir. Oran yıllık olduğu için sonuç yıl cinsindendir.
 
-**Python'da.** Defterdeki karşılıkları "[H] İkiye katlanma süresi" ve "[H] İskonto" bölümleridir. numpy-financial (npf) Excel'in GD, BD ve TAKSİT_SAYISI fonksiyonlarının karşılığını verir. İşaret kuralı Excel'dekiyle aynıdır.
+**Python'da.** Defterdeki karşılıkları "[H] İkiye katlanma süresi" ve "[H] İskonto" bölümleridir. numpy-financial (npf) Excel'in `FV`, `PV` ve `NPER` fonksiyonlarının karşılığını verir. İşaret kuralı Excel'dekiyle aynıdır.
 
 ```python
 import math
 import numpy_financial as npf               # Colab'da önce: %pip install -q numpy-financial
 r = 0.40
-print(round(npf.fv(r, 3, 0, -100000), 2))   # GD: 274400.0
-print(round(npf.pv(r, 1, 0, -100000), 2))   # BD: 71428.57
-print(round(npf.nper(r, 0, -1, 2), 4))      # TAKSİT_SAYISI: 2.06
+print(round(npf.fv(r, 3, 0, -100000), 2))   # FV: 274400.0
+print(round(npf.pv(r, 1, 0, -100000), 2))   # PV: 71428.57
+print(round(npf.nper(r, 0, -1, 2), 4))      # NPER: 2.06
 print(round(math.log(2) / math.log(1 + r), 4))  # LN ile: 2.06
 ```
 
-**Sık hata.** Bu hata, GD ve BD'de işareti unutmaktır: `=BD(B32;B99;0;B98)` -71.428,57 verir. Excel ve npf, cepten çıkan parayı eksi sayar.
+**Nerede kullanılır.** PV her değerlemenin temelidir: tahvil, hisse ve yatırım projesi gelecekteki nakit akışlarının bugünkü değeriyle ölçülür. 72 kuralı bir büyüme oranını zihinden hızlıca yorumlamak içindir.
+
+**Sık hata.** `=PV(B32,B99,0,B98)` -71.428,57 verir, çünkü Excel ve npf cepten çıkan parayı eksi sayar (16. bölüm, T8).
 
 > **Tahmin sorusu:** Yıllık %40'ta para kaç yılda ikiye katlanır: 2 yıldan az mı, çok mu?
 >
@@ -549,15 +600,15 @@ Taksit formülü `A = P × r / (1 - (1 + r)^(-n))` biçimindedir. P kredi tutar�
 | 3 | 2.570,89 | 7.475,32 | 78.220,87 |
 | 12 | 292,61 | 9.753,60 | 0,00 |
 
-**Excel'de.** Dosyada bu hesap için ayrı bir sayfa bulunmaz. Boş bir sayfada B1'e 100000, B2'ye 0,03, B3'e 12 yazılır. A7:A18 aralığına 1'den 12'ye ay numaraları, E6'ya başlangıç borcu (`=B1`) girilir. 7. satırın formülleri aşağıdaki tablodadır. Satır 18'e kadar aşağı sürüklenir. Oran ve süre `$` ile sabitlenir, önceki ayın kalan borcu göreli başvuruyla bir satır kayar.
+**Excel'de.** Dosyada bu hesap için ayrı bir sayfa bulunmaz. Boş bir sayfada B1'e 100000, B2'ye 0,03, B3'e 12 yazılır. A7:A18 aralığına 1'den 12'ye ay numaraları, E6'ya başlangıç borcu (`=B1`) girilir. `PMT` (payment) eşit taksiti, `IPMT` (interest payment) bir ayın faiz payını verir. 7. satırın formülleri aşağıdaki tablodadır. Satır 18'e kadar aşağı sürüklenir. Oran ve süre `$` ile sabitlenir, önceki ayın kalan borcu göreli başvuruyla bir satır kayar.
 
-| Sütun | Türkçe Excel | İngilizce | 1. ay |
-|---|---|---|---|
-| Taksit | `=-DEVRESEL_ÖDEME($B$2;$B$3;$B$1)` | `=-PMT($B$2,$B$3,$B$1)` | 10.046,21 |
-| Faiz | `=E6*$B$2` | aynı | 3.000,00 |
-| Anapara | `=B7-C7` | aynı | 7.046,21 |
-| Kalan borç | `=E6-D7` | aynı | 92.953,79 |
-| [S] Faiz, fonksiyonla | `=-FAİZTUTARI($B$2;A7;$B$3;$B$1)` | `=-IPMT($B$2,A7,$B$3,$B$1)` | 3.000,00 |
+| Sütun | Excel | 1. ay |
+|---|---|---|
+| Taksit | `=-PMT($B$2,$B$3,$B$1)` | 10.046,21 |
+| Faiz | `=E6*$B$2` | 3.000,00 |
+| Anapara | `=B7-C7` | 7.046,21 |
+| Kalan borç | `=E6-D7` | 92.953,79 |
+| [S] Faiz, fonksiyonla | `=-IPMT($B$2,A7,$B$3,$B$1)` | 3.000,00 |
 
 Formüllerdeki eksi işaret taksitin tabloda pozitif görünmesini sağlar. Excel ödenen parayı eksi gösterir. Sağlama sütunu her satırda faiz sütunuyla aynı değeri verir ve 12. ayın kalan borcu sıfırdır.
 
@@ -581,7 +632,9 @@ for ay in range(1, n + 1):
 
 **Sayılı örnek (varsayımsal).** 500 TL tahsis ücreti peşin alındığında ele geçen tutar 99.500 TL'dir ve taksit değişmez. Aylık maliyet, +99.500 ile 12 kez -10.046,21 TL'lik nakit akışının iç verim oranıdır: %3,08. Yıllık karşılığı (1 + aylık maliyet)^12 - 1 = %43,98'dir. Ücretsiz durumda aynı ölçü 1,03^12 - 1 = %42,58 verir. Vergiler dahil EYFO bu iki değerin üstündedir.
 
-Excel'de nakit akışı bir sütuna yazılır ve `=İÇ_VERİM_ORANI(...)` (İngilizce `=IRR(...)`) uygulanır. Python'da aynı hesap `npf.irr([99_500] + [-taksit] * 12)` ile yapılır.
+Excel'de nakit akışı bir sütuna yazılır ve `=IRR(...)` (internal rate of return, iç verim oranı) uygulanır. Python'da aynı hesap `npf.irr([99_500] + [-taksit] * 12)` ile yapılır.
+
+**Nerede kullanılır.** Eşit taksit ihtiyaç, taşıt ve konut kredilerinde yaygın geri ödeme biçimidir. Amortisman tablosundaki kalan borç, kredinin belirli bir ayda kapatılması için gereken anaparayı gösterir (ücretler hariç).
 
 > **Tahmin sorusu:** 500 TL tahsis ücreti alınan bir kredide akdi faiz oranı değişir mi?
 >
@@ -604,22 +657,22 @@ Excel'de nakit akışı bir sütuna yazılır ve `=İÇ_VERİM_ORANI(...)` (İng
 | 3. Bileşiklenme sıklığı | 47-58 | m = 1, 2, 4, 12 ve sürekli |
 | 4. Nominal ve etkin | 60-71 | aylık %3 |
 | 5. Reel faiz | 73-83 | politika faizi ve TÜFE |
-| 6. İkiye katlanma | 85-95 | TAKSİT_SAYISI, LN, 72 kuralı |
-| 7. İskonto | 97-105 | BD |
+| 6. İkiye katlanma | 85-95 | NPER, LN, 72 kuralı |
+| 7. İskonto | 97-105 | PV |
 
 **Haftanın Excel fonksiyonları.**
 
-| Türkçe | İngilizce | Ne yapar | Faiz sayfasında |
-|---|---|---|---|
-| GD | FV | Gelecekteki değer | `=GD(B32;B33;0;-B31)` |
-| BD | PV | Bugünkü değer | `=BD(B32;B99;0;-B98)` |
-| ETKİN | EFFECT | Yıllık nominal ve m'den yıllık etkin | `=ETKİN(B64;B62)` |
-| NOMİNAL | NOMINAL | Yıllık etkin ve m'den yıllık nominal | `=NOMİNAL(B65;B62)` |
-| ÜS | EXP | e üzeri sayı | `=B31*ÜS(B32*B33)` |
-| LN | LN | Doğal logaritma | `=LN(B86)/LN(1+B32)` |
-| TAKSİT_SAYISI | NPER | Hedefe kaç dönemde ulaşılır | `=TAKSİT_SAYISI(B32;0;-1;B86)` |
+| Excel | Ne yapar | Faiz sayfasında |
+|---|---|---|
+| `FV` | Gelecekteki değer | `=FV(B32,B33,0,-B31)` |
+| `PV` | Bugünkü değer | `=PV(B32,B99,0,-B98)` |
+| `EFFECT` | Yıllık nominal ve m'den yıllık etkin | `=EFFECT(B64,B62)` |
+| `NOMINAL` | Yıllık etkin ve m'den yıllık nominal | `=NOMINAL(B65,B62)` |
+| `EXP` | e üzeri sayı | `=B31*EXP(B32*B33)` |
+| `LN` | Doğal logaritma | `=LN(B86)/LN(1+B32)` |
+| `NPER` | Hedefe kaç dönemde ulaşılır | `=NPER(B32,0,-1,B86)` |
 
-Uygulama sayfasında ayrıca RANK.EŞİT (RANK.EQ), MAK (MAX), İNDİS (INDEX) ve KAÇINCI (MATCH) kullanılır.
+Uygulama sayfasında ayrıca `RANK.EQ` (sıra), `MAX` (en büyük değer), `INDEX` (konumdaki değer) ve `MATCH` (değerin konumu) kullanılır.
 
 **Sezgi.** Sayfanın her bölümü aynı ritimle ilerler: mavi girdi, [D] satırı, [H] formülü, [S] sağlaması, [Y] cümlesi. Bir sonuç okunurken önce [S] hücresine bakılır. Bu hücre 0 değilse sonuca güvenilmez.
 
@@ -633,7 +686,7 @@ Ardından B32 yeniden %40 yapılır. Bir girdiyi değiştirip modelin nasıl tep
 
 **Python'da.** Defterin "Faiz türleri ve teknik hesaplar" bölümü bu sayfanın sırasını izler. Her bölüm başlığında "(Faiz sayfası, N. bölüm)" yazar. Değişken adları: `P` (B31), `r` (B32), `n` (B33).
 
-**Sık hata.** Bu hata, İngilizce adı Türkçe Excel'e yazmaktır (`=EFFECT(...)`). Excel bu adı tanımaz ve `#NAME?` gösterir. Kullanılan Excel'in dilindeki ad yazılır.
+**Sık hata.** Bu hata, Türkçe Excel'e İngilizce adın yazılmasıdır (`=EFFECT(...)`). Excel bu adı tanımaz ve `#NAME?` gösterir. Yerel ad fx düğmesiyle bulunur ve argümanlar noktalı virgülle ayrılır.
 
 > **Tahmin sorusu:** Faiz!B32 %30 yapılırsa 5. bölümdeki reel faiz (B77) değişir mi?
 >
@@ -651,7 +704,7 @@ Ardından B32 yeniden %40 yapılır. Bir girdiyi değiştirip modelin nasıl tep
 3. **[H]** Bileşik türler yıllık etkin orana çevrilmiştir (3. bölüm). Böylece farklı sıklıkla işleyen oranlar tek ölçüde buluşmuştur.
 4. **[H]** Gerçek politika faizi, Eylül 2026 yıllık TÜFE'siyle reel faize çevrilmiştir (5. bölüm).
 
-**[S] Sağlama.** Yıllık bileşik tutar, elle kurulan formülle ve GD ile aynıdır (Faiz!B44 = 0). Aylık etkin oran, formülle ve ETKİN ile aynıdır (Faiz!B55 = 0). Fisher eşitliği geri kurulduğunda reel faiz nominal faize döner (Faiz!B81 = 0). Defterde aynı üç sonuç `assert` ile Excel değerlerine bağlanmıştır.
+**[S] Sağlama.** Yıllık bileşik tutar, elle kurulan formülle ve `FV` ile aynıdır (Faiz!B44 = 0). Aylık etkin oran, formülle ve `EFFECT` ile aynıdır (Faiz!B55 = 0). Fisher eşitliği geri kurulduğunda reel faiz nominal faize döner (Faiz!B81 = 0). Defterde aynı üç sonuç `assert` ile Excel değerlerine bağlanmıştır.
 
 **Sonuç**
 
@@ -659,10 +712,10 @@ Ardından B32 yeniden %40 yapılır. Bir girdiyi değiştirip modelin nasıl tep
 |---|---|---|---|
 | Basit, 3 yıl | Faiz!B38 | `=B31*(1+B32*B33)` | 220.000,00 TL |
 | Yıllık bileşik, 3 yıl | Faiz!B39 | `=B31*(1+B32)^B33` | 274.400,00 TL |
-| Sürekli bileşik, 3 yıl | Faiz!B41 | `=B31*ÜS(B32*B33)` | **332.011,69 TL** |
+| Sürekli bileşik, 3 yıl | Faiz!B41 | `=B31*EXP(B32*B33)` | **332.011,69 TL** |
 | Yıllık etkin, yıllık bileşik | Faiz!D50 | `=(1+C50)^B50-1` | %40,0000 |
 | Yıllık etkin, aylık bileşik | Faiz!D53 | `=(1+C53)^B53-1` | %48,2126 |
-| Yıllık etkin, sürekli | Faiz!D54 | `=ÜS($B$32)-1` | %49,1825 |
+| Yıllık etkin, sürekli | Faiz!D54 | `=EXP($B$32)-1` | %49,1825 |
 | Reel politika faizi, Eylül 2026 | Faiz!B77 | `=(1+B74)/(1+B75)-1` | **%5,60** |
 
 **[Y] Karar cümlesi.** Aynı yıllık %40, 3 yılda basit faizle 220.000 TL, yıllık bileşikle 274.400 TL, sürekli bileşikle 332.011,69 TL eder. Aradaki 112.011,69 TL yalnız faiz türünden gelir. Bu yüzden teklifler manşetteki orana göre değil, yıllık etkin orana göre karşılaştırılır. Satın alma gücü için bir adım daha gerekir: %37'lik politika faizi, Eylül'deki %29,73'lük yıllık enflasyonla reel olarak %5,60'tır. Kısa yolla bulunan "7,27 puan" reel faizi 1,67 puan fazla gösterir.
@@ -688,16 +741,16 @@ Defter açıldıktan sonra Dosya > Drive'a kopya kaydet menüsüyle bir kopya al
 - **Değişken:** `r = 0.40`. Excel'deki bir girdi hücresinin karşılığıdır. Python ondalık için nokta kullanır, yüzde işareti yoktur.
 - **Fonksiyon:** `def etkin(r, m): return (1 + r / m) ** m - 1`. Bir formülü bir kez yazıp her yerde kullanmaktır.
 - **Döngü:** `for m in [1, 2, 4, 12]:`. Excel'de formülü aşağı sürüklemenin karşılığıdır.
-- **Modül:** `import math` (ÜS ve LN için `math.exp`, `math.log`); `import numpy_financial as npf` (GD, BD, TAKSİT_SAYISI için).
+- **Modül:** `import math` (`EXP` ve `LN` için `math.exp`, `math.log`); `import numpy_financial as npf` (`FV`, `PV`, `NPER` için).
 
-| Ne | Excel (Türkçe) | Excel (İngilizce) | Python | Defterde |
-|---|---|---|---|---|
-| Üs | `^` | `^` | `**` | Basit, bileşik ve sürekli |
-| e üzeri | `ÜS(x)` | `EXP(x)` | `math.exp(x)` | aynı bölüm |
-| Doğal logaritma | `LN(x)` | `LN(x)` | `math.log(x)` | İkiye katlanma |
-| Yıllık etkin | `ETKİN(r;m)` | `EFFECT(r,m)` | `(1 + r/m) ** m - 1` | Nominal ve etkin |
-| Bugünkü değer | `BD(r;n;0;-GD)` | `PV(r,n,0,-FV)` | `npf.pv(r, n, 0, -gd)` | İskonto |
-| Sağlama | fark hücresi | fark hücresi | `assert abs(a - b) < 0.01` | her [S] hücresi |
+| Ne | Excel | Python | Defterde |
+|---|---|---|---|
+| Üs | `^` | `**` | Basit, bileşik ve sürekli |
+| e üzeri | `EXP(x)` | `math.exp(x)` | aynı bölüm |
+| Doğal logaritma | `LN(x)` | `math.log(x)` | İkiye katlanma |
+| Yıllık etkin | `EFFECT(r,m)` | `(1 + r/m) ** m - 1` | Nominal ve etkin |
+| Bugünkü değer | `PV(r,n,0,-FV)` | `npf.pv(r, n, 0, -gd)` | İskonto |
+| Sağlama | fark hücresi | `assert abs(a - b) < 0.01` | her [S] hücresi |
 
 **Temel şerit (PRIMM).** Defterin her hücresinde dört iş vardır. Tahmin: "[H] Bileşiklenme sıklığı" hücresi çalıştırılmadan önce m = 12 satırında yıllık etkin oranın kaç çıkacağı Faiz!D53'ten yazılır. Çalıştırma: Shift+Enter. İnceleme: çıktı Excel'le karşılaştırılır. Değiştirme: `r = 0.40` satırı `0.30` yapılır, hücre yeniden çalıştırılır ve değişiklik geri alınır. Kontrol hücresindeki `assert` değiştirilen değerle hata verirse bu beklenen bir sonuçtur, çünkü Excel'deki sayı hâlâ %40'a aittir.
 
@@ -723,7 +776,7 @@ Bu bölüm Python bilen ya da G1-G4'ü bitiren öğrenci içindir. Nota etkisi y
 
 Uygulama toplam 50 dakikadır ve eşli yapılır. G1-G2 Excel'in Uygulama sayfasında, G3-G4 defterin "Uygulama G3-G4" bölümündedir. Cevaplar bu notta yer almaz ve derste tartışılır.
 
-**G1 (Excel, 12 dk): bileşiklenme sıklığı tablosu.** Girdiler Uygulama!B6:B9 hücrelerindedir. Satır 11-16'da m = 1, 2, 4, 12, 52, 365 için dönem oranı (C), formülle yıllık etkin oran (D), ETKİN ile yıllık etkin oran (E), fark (F), 1 yıl (G) ve 3 yıl (H) sonundaki tutar kurulur. Satır 17'de sürekli bileşik ÜS ile yazılır. B20:B23'te sağlamalar ve karşılaştırmalar doldurulur. Son adımda yıllık etkin oran ile m'nin grafiği çizilir ve yatay eksen logaritmik yapılır. B24'e yorum yazılır.
+**G1 (Excel, 12 dk): bileşiklenme sıklığı tablosu.** Girdiler Uygulama!B6:B9 hücrelerindedir. Satır 11-16'da m = 1, 2, 4, 12, 52, 365 için dönem oranı (C), formülle yıllık etkin oran (D), `EFFECT` ile yıllık etkin oran (E), fark (F), 1 yıl (G) ve 3 yıl (H) sonundaki tutar kurulur. Satır 17'de sürekli bileşik `EXP` ile yazılır. B20:B23'te sağlamalar ve karşılaştırmalar doldurulur. Son adımda yıllık etkin oran ile m'nin grafiği çizilir ve yatay eksen logaritmik yapılır. B24'e yorum yazılır.
 
 **G2 (Excel, 12 dk): dört teklif, tek ölçü.** Oranlar varsayımsaldır, stopaj yoktur ve her teklif vade sonunda aynı koşulla yenilenir.
 - A: 32 gün vadeli, yıllık %40, basit (oran × gün / 365)
@@ -731,7 +784,7 @@ Uygulama toplam 50 dakikadır ve eşli yapılır. G1-G2 Excel'in Uygulama sayfas
 - C: 1 yıl vadeli, yıllık %43
 - D: aylık %3,1, bileşik
 
-Her teklif yıllık etkin orana çevrilir (G42:G45), RANK.EŞİT ile sıralanır (H42:H45) ve B48:B54 doldurulur. B55'e sıralamanın nedeni ve hangi varsayım değişirse sıralamanın değişeceği yazılır.
+Her teklif yıllık etkin orana çevrilir (G42:G45), `RANK.EQ` ile sıralanır (H42:H45) ve B48:B54 doldurulur. B55'e sıralamanın nedeni ve hangi varsayım değişirse sıralamanın değişeceği yazılır.
 
 **G3 (Python, 12 dk): fonksiyon ve döngü.** `etkin(r, m)`, `surekli(r)`, `reel(i, pi)`, `katlanma_suresi(r)` fonksiyonları yazılır. r = %1, ..., %60 için 72 kuralının hata tablosu döngüyle kurulur. Hatanın sıfıra en yakın olduğu oran bulunur. %30'un üstünde hatanın neden büyüdüğü iki cümleyle açıklanır.
 
@@ -742,23 +795,89 @@ Her teklif yıllık etkin orana çevrilir (G42:G45), RANK.EŞİT ile sıralanır
 
 ---
 
-## 16. Sık hatalar ve hata mesajları
+## 16. Tuzaklar ve hatalar
 
-Aşağıdaki hatalar bu haftanın hesaplarında kolayca yapılır. Bir sonuç beklenmedik çıktığında önce [S] hücresine, sonra bu tabloya bakılır.
+Aşağıdaki tuzaklar bu haftanın hesaplarında kolayca düşülen yanlışlardır. Her biri belirti, neden, düzeltme ve sayılı örnekle verilir. Bir sonuç beklenmedik çıktığında önce [S] hücresine, sonra bu bölüme bakılır.
+
+### T1. "Nominal" kelimesinin iki anlamı
+
+- **Belirti.** "Nominal faiz %36" ile "nominal faiz %37" aynı kavram sanılır.
+- **Neden.** Kelime iki ayrı karşıtlıkta kullanılır. Yıllık nominal oran bileşiklenmeyi saymayan orandır ve karşıtı yıllık etkin orandır (7. bölüm). Nominal faiz ise enflasyondan arındırılmamış faizdir ve karşıtı reel faizdir (8. bölüm).
+- **Düzeltme.** "Nominal" görüldüğünde neyin karşıtı olduğu sorulur: etkinin mi, reelin mi?
+- **Örnek.** Aylık %3 × 12 = %36 yıllık nominal orandır (Faiz!B64). %37 politika faizi ise enflasyona göre nominal faizdir (Faiz!B74).
+
+### T2. Aylık oranın 12 ile çarpılıp yıllık maliyet sanılması
+
+- **Belirti.** "Aylık %3'lük kredinin yıllık maliyeti %36'dır" denir.
+- **Neden.** 12 ile çarpma, her ayın faizinin yalnız anaparaya işlediğini varsayar. Oysa her ay eklenen faiz sonraki aylarda faiz kazanır. Yıllık maliyet bu yüzden çarpımdan büyüktür.
+- **Düzeltme.** Yıllık etkin oran `=(1+B61)^B62-1` ile bulunur.
+- **Örnek.** %36 yerine %42,58 (Faiz!B65); fark 6,58 puandır (Faiz!B68).
+
+### T3. EFFECT'e dönem oranı verilmesi ve dönem sayısının kesilmesi
+
+- **Belirti.** `=EFFECT(B61,B62)` aylık %3 için %3,04 verir.
+- **Neden.** `EFFECT` ilk argümanda yıllık nominal oran bekler ve onu içeride m'ye böler. Aylık %3 verilirse hesap %3 / 12 = %0,25'lik aylık oranla yapılır. Ayrıca `EFFECT` ikinci argümanı tam sayıya keser (Microsoft belgesi); gün esaslı vadede m = 365 / gün tam sayı değildir.
+- **Düzeltme.** İlk argümana yıllık nominal oran (Faiz!B64) verilir. m tam sayı değilse `=(1+dönem_oranı)^m-1` yazılır.
+- **Örnek (varsayımsal).** 100 gün vadeli, yıllık %40 basit teklif: dönem oranı 0,40 × 100 / 365 = %10,96, m = 3,65. Formül yıllık etkin oranı %46,16 verir. `EFFECT` m'yi 3'e kestiği için %45,57 verir.
+
+### T4. Reel faizde kısa yol ve yanlış bölme
+
+- **Belirti.** "Reel faiz = 37 - 29,73 = %7,27" yazılır ya da 1,37 / 0,2973 hesaplanır.
+- **Neden.** Fisher eşitliği açıldığında i = reel + π + reel × π çıkar. Kısa yol son terimi atlar. Oranlar düşükken bu terim küçüktür, %30-40 düzeyinde ise puanlarla ölçülür. Bölme yalnız (1 + oran) terimleri arasında anlamlıdır.
+- **Düzeltme.** `=(1+B74)/(1+B75)-1`.
+- **Örnek.** Fisher %5,60 (Faiz!B77), kısa yol 7,27 puan (Faiz!B78), fark 1,67 puan (Faiz!B79). Yanlış bölme 4,61 verir; bu sayı hiçbir reel faize karşılık gelmez.
+
+### T5. Geriye dönük ve ileriye dönük reel faiz
+
+- **Belirti.** Bugün yatırılan paranın reel getirisi geçmiş 12 ayın enflasyonuyla hesaplanır ve kesin sonuç gibi okunur.
+- **Neden.** Eylül 2026 yıllık TÜFE'si, Eylül 2025'ten Eylül 2026'ya fiyat artışını ölçer. Bugün yatırılan paranın reel getirisi ise önümüzdeki 12 ayın enflasyonuna bağlıdır ve bu enflasyon bugün bilinmez.
+- **Düzeltme.** Geçmiş enflasyonla bulunan ölçü "geriye dönük" diye yazılır. İleriye dönük reel faiz için beklenen enflasyon kullanılır (ör. TCMB Piyasa Katılımcıları Anketi).
+- **Örnek.** %5,60 geriye dönük bir ölçüdür. Önümüzdeki 12 ayda enflasyon %29,73'ten farklı çıkarsa gerçekleşen reel getiri de farklı olur.
+
+### T6. Politika faizinin mevduat ya da kredi faizi sanılması
+
+- **Belirti.** "Politika faizi %37 olduğuna göre mevduat da kredi de %37'dir" denir.
+- **Neden.** %37, TCMB'nin bankalarla yaptığı bir hafta vadeli repo işlemlerinin oranıdır. Mevduat ve kredi faizlerini bankalar belirler. Bu oranlar vadeye, ürüne ve bankaya göre değişir.
+- **Düzeltme.** Oranın kimin kime ödediği oran olduğu yazılır. Kredi için EYFO, mevduat için bankanın ilan ettiği oran okunur.
+- **Örnek.** G2'deki varsayımsal mevduat teklifleri yıllık %40, %41 ve %43'tür; politika faizi ise %37'dir.
+
+### T7. Yüzde ile yüzde puanın karıştırılması
+
+- **Belirti.** "Faiz %38'den %37'ye indi, yani %1 düştü" denir.
+- **Neden.** Yüzde puan iki oranın farkıdır. Yüzde değişim ise farkın eski orana bölümüdür. "%1" ikisinden hangisinin kastedildiğini söylemez.
+- **Düzeltme.** Fark puan (pp) ya da baz puan (bp) ile, oransal değişim yüzde ile yazılır.
+- **Örnek.** 37 - 38 = -1 puan = -100 baz puan; 37 / 38 - 1 = -%2,63 (9. bölüm).
+
+### T8. FV ve PV'de işaret
+
+- **Belirti.** `=PV(0.40,1,0,100000)` -71.428,57 verir.
+- **Neden.** Excel ve npf nakit akışını cep açısından okur: alınan para artı, ödenen para eksidir. Gelecekte alınacak 100.000 TL artı girilirse bugün yatırılacak tutar cepten çıktığı için eksi döner. Bu bir hata değil, işaret kuralıdır.
+- **Düzeltme.** Gelecek tutar eksi girilir ya da formülün başına eksi konur.
+- **Örnek.** `=PV(B32,B99,0,-B98)` 71.428,57 TL verir (Faiz!B102). Python'da `npf.pv(0.40, 1, 0, 100000)` -71428.57 verir.
+
+### T9. Python ile Excel farkları
+
+- **Belirti.** `1.4 ^ 3` hata verir, `2 ^ 3` sessizce 1 verir, `100000 * 1.4 ** 3` 274399.99999999994 yazar.
+- **Neden.** Python'da üs işleci `**`'dir; `^` bit düzeyinde XOR işlecidir ve ondalık sayıyla çalışmaz (`TypeError`). Bilgisayar ondalık sayıları ikili tabanda yaklaşık tutar, bu yüzden son basamakta küçük farklar oluşur. Excel aynı değeri 274.400,00 olarak gösterir.
+- **Düzeltme.** Üs için `**` yazılır. Karşılaştırma `==` ile değil `abs(a - b) < 0.01` ile yapılır. Ondalık ayırıcı noktadır: %40, `0.40` olur.
+- **Örnek.** `100000 * 1.4 ** 3 == 274400` False verir; `abs(100000 * 1.4 ** 3 - 274400) < 0.01` True verir.
+
+### T10. Mevduat tekliflerinde gizli yenileme varsayımı
+
+- **Belirti.** Kısa vadeli bir teklifin yıllık etkin oranı kesin getiri gibi okunur.
+- **Neden.** Kısa vadeli teklifin yıllık etkin oranı, her vade sonunda paranın aynı oranla yeniden yatırıldığını varsayar. Yenileme günündeki oran bugünküyle aynı olmayabilir. Stopaj (faiz gelirinden kesilen vergi) da getiriyi azaltır.
+- **Düzeltme.** Yorumda varsayım açıkça yazılır: "her vade sonunda aynı oranla yenileme, stopaj yok".
+- **Örnek (varsayımsal).** 1 aylık mevduat, aylık %3: 12 ay aynı oranla yenilenirse yıllık etkin oran %42,58'dir. Oran son 6 ayda aylık %2,5'e inerse yıllık büyüme 1,03^6 × 1,025^6 - 1 = %38,47 olur.
+
+**Diğer sık hatalar.**
 
 | Hata | Belirti | Düzeltme |
 |---|---|---|
 | Oranı 40 yazmak (%40 yerine) | Sonuçlar milyonlarca TL | Hücreye 0,40 ya da %40 yazılır |
-| ETKİN'e dönem oranını vermek | Yıllık etkin, dönem oranına çok yakın çıkar | ETKİN yıllık nominali ister |
 | Bileşikte `^` yerine `*` | 3 yılda 420.000 TL gibi tutarsız sonuç | `=B31*(1+B32)^B33` |
-| ÜS ile `^`'yi karıştırmak | `=ÜS^2` gibi formül hata verir | ÜS bir fonksiyondur: `ÜS(x)` |
-| Reel faizi "faiz eksi enflasyon" ile yazmak | Yüksek oranda 1-2 puan fazla | `(1+i)/(1+π)-1` |
-| İki "nominal"i karıştırmak | Yıllık nominal ile enflasyondan arındırılmamış faiz aynı sanılır | Bağlam belirleyicidir: bileşiklenme ya da enflasyon |
-| GD ve BD'de işaret | Sonuç eksi çıkar | Yatırılan ya da gelecekteki tutar eksi girilir |
+| `EXP` ile `^`'yi karıştırmak | `=EXP^2` gibi formül hata verir | `EXP` bir fonksiyondur: `EXP(x)` |
 | 72 kuralına kesir vermek | Yüzlerce yıl çıkar | Kural yüzde sayısı ister: 72 / 40 |
 | Süreyi yıla çevirmemek | 3 aylık faiz yıllık kadar çıkar | Önce [D]: 3 ay = 3 / 12 yıl |
-| Yüzde puanı yüzde değişim sanmak | "%38'den %37'ye, %1 düştü" | 1 puan; oransal -%2,63 |
-| Python'da üs için `^` yazmak | `1.4 ^ 3` hata verir; tam sayıda `2 ^ 3` sessizce 1 verir | Python'da üs `**` |
 | Kodda matematiksel eksi (U+2212) | Python: `SyntaxError: invalid character` | Klavyedeki `-` işareti kullanılır |
 
 **Hata mesajları.** Excel hata değerleri İngilizce adlarıyla verilmiştir. Türkçe Excel'deki karşılıkları doğrulanmamıştır.
@@ -783,10 +902,10 @@ Cevaplar notun sonundadır (21. bölüm). Sorular önce cevaplara bakmadan çöz
 3. Faiz %45, enflasyon %35'tir. Fisher ile reel faiz kaçtır? Kısa yol reel faizi kaç puan fazla gösterir?
 4. Bir faiz %42'den %39,5'e inmiştir. Değişim kaç puan, kaç baz puan, oransal olarak yüzde kaçtır?
 5. İki kredinin akdi faizi aynıdır, birinin tahsis ücreti vardır. Krediler hangi ölçüyle karşılaştırılır ve neden?
-6. Bir öğrenci aylık %3 için Faiz sayfasında `=ETKİN(B61;B62)` yazmıştır. Bu formül ne bulur, neden yanlıştır, doğrusu nedir?
+6. Bir öğrenci aylık %3 için Faiz sayfasında `=EFFECT(B61,B62)` yazmıştır. Bu formül ne bulur, neden yanlıştır, doğrusu nedir?
 7. Bir öğrenci 72 kuralını `=72/B32` biçiminde yazmıştır. Bu formül ne bulur, doğrusu nedir?
-8. `=TAKSİT_SAYISI(B32;0;-1;B86)` ve `=NOMİNAL(B65;B62)` formüllerinin Python karşılığı nedir?
-9. 2 yıl sonra alınacak 50.000 TL'nin yıllık %30 ile bugünkü değeri kaçtır? Excel'de BD ile nasıl yazılır?
+8. `=NPER(B32,0,-1,B86)` ve `=NOMINAL(B65,B62)` formüllerinin Python karşılığı nedir?
+9. 2 yıl sonra alınacak 50.000 TL'nin yıllık %30 ile bugünkü değeri kaçtır? Excel'de `PV` ile nasıl yazılır?
 10. Bir kişi "İki teklif de yıllık %40, fark etmez" demektedir. Tekliflerden biri yıllık, öteki aylık bileşiktir. Bu görüşe tek cümlelik bir cevap nasıl yazılır? Cevap cümlesinde kullanılan ölçü ve dayanılan varsayım belirtilir.
 11. Yıllık nominal %30 sürekli bileşikle işlemektedir. Yıllık etkin oran kaçtır? Excel'de ve Python'da nasıl yazılır?
 
@@ -799,12 +918,12 @@ Cevaplar notun sonundadır (21. bölüm). Sorular önce cevaplara bakmadan çöz
 - Finansal programlama, bir soruyu veri, model, algoritma ve karar zincirine çevirmektir. Excel modeli görünür kılar, Python ölçekler, sağlama ikisini bağlar.
 - Faiz paranın kirasıdır ve her oranın bir dönemi vardır.
 - Aynı yıllık %40, 3 yılda basit 220.000, yıllık bileşik 274.400, sürekli 332.011,69 TL eder.
-- Teklifler yıllık etkin oranla karşılaştırılır: `(1 + r/m)^m - 1`, Excel'de ETKİN.
+- Teklifler yıllık etkin oranla karşılaştırılır: `(1 + r/m)^m - 1`, Excel'de `EFFECT`.
 - Reel faiz `(1 + i) / (1 + π) - 1`'dir. Eylül 2026'da politika faizi için reel faiz %5,60'tır. Kısa yol yüksek oranda fazla gösterir.
-- BD, GD'nin tersidir. İkiye katlanma süresi `LN(2) / LN(1 + r)` ile bulunur ve 72 kuralı bu sürenin yaklaşığıdır.
+- PV, FV'nin tersidir. İkiye katlanma süresi `LN(2) / LN(1 + r)` ile bulunur ve 72 kuralı bu sürenin yaklaşığıdır.
 - Politika faizi, mevduat faizi, akdi faiz ve EYFO farklı sayılardır.
 
-**Sonraki hafta.** H3'te GD ve BD taksitli ödemelere genişletilir: DEVRESEL_ÖDEME ile kredi taksiti, NBD ve İÇ_VERİM_ORANI ile yatırım kararı. Bu hafta yazılan `=GD(B32;B33;0;-B31)` formülü orada ara ödemeli haliyle kullanılır.
+**Sonraki hafta.** H3'te FV ve PV taksitli ödemelere genişletilir: `PMT` ile kredi taksiti, `NPV` (net present value, net bugünkü değer) ve `IRR` ile yatırım kararı. Bu hafta yazılan `=FV(B32,B33,0,-B31)` formülü orada ara ödemeli haliyle kullanılır.
 
 ---
 
@@ -837,23 +956,22 @@ Cevaplar notun sonundadır (21. bölüm). Sorular önce cevaplara bakmadan çöz
 - TÜİK, Ulusal Veri Yayımlama Takvimi: Eylül 2026 TÜFE, 05.10.2026. https://www.tuik.gov.tr/Kurumsal/Veri_Takvimi (okunma: 30.09.2026)
 - GFLEC, Lusardi ve Mitchell'in üç sorusu. https://gflec.org/wp-content/uploads/2015/04/3-Questions-Article2.pdf
 - OECD (2016), yetişkin finansal okuryazarlık anketi: tam künye el kitabının f02 bölümünde, 7. bölümde yer alır.
-- Microsoft Destek: [ETKİN](https://support.microsoft.com/tr-tr/excel/functions/effect-function), [NOMİNAL](https://support.microsoft.com/tr-tr/excel/functions/nominal-function), [TAKSİT_SAYISI](https://support.microsoft.com/tr-tr/excel/functions/nper-function), [ÜS](https://support.microsoft.com/tr-tr/excel/functions/exp-function), [GD](https://support.microsoft.com/tr-tr/excel/functions/fv-function), [BD](https://support.microsoft.com/tr-tr/excel/functions/pv-function), [LN](https://support.microsoft.com/tr-tr/excel/functions/ln-function), [DEVRESEL_ÖDEME](https://support.microsoft.com/tr-tr/excel/functions/pmt-function), [FAİZTUTARI](https://support.microsoft.com/tr-tr/excel/functions/ipmt-function), [İÇ_VERİM_ORANI](https://support.microsoft.com/tr-tr/excel/functions/irr-function). Türkçe GD sayfasının sözdizimi satırında 4. argümanın adı yanlış çevrilmiştir. Doğru ad bd'dir (bugünkü değer).
+- Microsoft Destek: [EFFECT](https://support.microsoft.com/tr-tr/excel/functions/effect-function), [NOMINAL](https://support.microsoft.com/tr-tr/excel/functions/nominal-function), [NPER](https://support.microsoft.com/tr-tr/excel/functions/nper-function), [EXP](https://support.microsoft.com/tr-tr/excel/functions/exp-function), [FV](https://support.microsoft.com/tr-tr/excel/functions/fv-function), [PV](https://support.microsoft.com/tr-tr/excel/functions/pv-function), [LN](https://support.microsoft.com/tr-tr/excel/functions/ln-function), [PMT](https://support.microsoft.com/tr-tr/excel/functions/pmt-function), [IPMT](https://support.microsoft.com/tr-tr/excel/functions/ipmt-function), [IRR](https://support.microsoft.com/tr-tr/excel/functions/irr-function).
 - TCMB, Finansal Tüketicilerden Alınacak Ücretlere İlişkin Usûl ve Esaslar Hakkında Tebliğ (Sayı: 2020/7), md. 10/1; Resmî Gazete 07.03.2020. https://mevzuat.gov.tr/File/GeneratePdf?mevzuatNo=34343&mevzuatTur=Teblig&mevzuatTertip=5 . KKDF, BSMV ve EYFO mevzuatı: el kitabının f03 bölümü, 7. bölüm.
 - numpy-financial 1.1.0 API listesi: https://numpy.org/numpy-financial/latest/api.html
-- Excel fonksiyonlarının Türkçe adları ve Python karşılıkları Microsoft TR ve EN sayfalarıyla doğrulanmıştır.
 
 ---
 
 ## 21. Alıştırma sorularının cevapları
 
-1. A1'de 50.000, A2'de 0,30, A3'te 2. Basit `=A1*(1+A2*A3)` → 80.000,00 TL. Yıllık bileşik `=A1*(1+A2)^A3` → 84.500,00 TL. Sürekli `=A1*ÜS(A2*A3)` / İngilizce `=A1*EXP(A2*A3)` → 91.105,94 TL. Neden: bileşikte ilk yılın 15.000 TL faizi ikinci yıl 4.500 TL faiz kazanır. Basit ile bileşik arasındaki 4.500 TL tam olarak bu faizin faizidir. Sağlama: `=GD(A2;A3;0;-A1)` / `=FV(A2,A3,0,-A1)` de 84.500,00 TL verir.
-2. A1'de 0,24, A2'de 12. `=ETKİN(A1;A2)` / İngilizce `=EFFECT(A1,A2)` → %26,82. Sağlama: `=(1+A1/A2)^A2-1` aynı sonucu verir. Neden: dönem oranı %2'dir ve her ay eklenen faiz sonraki aylarda faiz kazanır. Bu etki yıllık nominale 2,82 puan ekler.
+1. A1'de 50.000, A2'de 0,30, A3'te 2. Basit `=A1*(1+A2*A3)` → 80.000,00 TL. Yıllık bileşik `=A1*(1+A2)^A3` → 84.500,00 TL. Sürekli `=A1*EXP(A2*A3)` → 91.105,94 TL. Neden: bileşikte ilk yılın 15.000 TL faizi ikinci yıl 4.500 TL faiz kazanır. Basit ile bileşik arasındaki 4.500 TL tam olarak bu faizin faizidir. Sağlama: `=FV(A2,A3,0,-A1)` de 84.500,00 TL verir.
+2. A1'de 0,24, A2'de 12. `=EFFECT(A1,A2)` → %26,82. Sağlama: `=(1+A1/A2)^A2-1` aynı sonucu verir. Neden: dönem oranı %2'dir ve her ay eklenen faiz sonraki aylarda faiz kazanır. Bu etki yıllık nominale 2,82 puan ekler.
 3. A1'de 0,45, A2'de 0,35. `=(1+A1)/(1+A2)-1` → %7,41. Kısa yol `=(A1-A2)*100` → 10 puan, yani 2,59 puan fazla. Neden: (1 + i) = (1 + reel) × (1 + π) açılınca i = reel + π + reel × π çıkar ve kısa yol son terimi atlar. Burada 0,0741 × 0,35 = 2,59 puandır. Oranlar yüksekken bu terim büyür.
 4. A1'de 0,42, A2'de 0,395. Puan `=(A2-A1)*100` → -2,5 puan; baz puan `=(A2-A1)*10000` → -250; oransal `=A2/A1-1` → -%5,95. Neden: puan iki oranın farkıdır, oransal değişim ise eski orana göre değişimdir. Haberde hangisinin kastedildiği yazılmalıdır.
 5. EYFO ile. Akdi faiz yalnız faizi gösterir. EYFO ise faizi, vergileri ve ücreti birlikte yıllık orana çevirir. İki kredinin akdi faizi aynıysa ücretli olanın EYFO'su daha yüksektir, çünkü borçlunun eline daha az para geçer ama taksitler aynıdır (el kitabı f03, 2.6).
-6. Faiz!B61 = %3, B62 = 12. `=ETKİN(B61;B62)` aylık %3'ü yıllık nominal sanar ve %3'ü 12'ye böler: (1 + 0,0025)^12 - 1 = %3,04. Doğrusu `=ETKİN(B64;B62)` / İngilizce `=EFFECT(B64,B62)` → %42,5761 (Faiz!B66). Neden: ETKİN'in ilk argümanı yıllık nominal orandır. Aylık oran önce 12 ile çarpılır (Faiz!B64).
+6. Faiz!B61 = %3, B62 = 12. `=EFFECT(B61,B62)` aylık %3'ü yıllık nominal sanar ve %3'ü 12'ye böler: (1 + 0,0025)^12 - 1 = %3,04. Doğrusu `=EFFECT(B64,B62)` → %42,5761 (Faiz!B66). Neden: `EFFECT`'in ilk argümanı yıllık nominal orandır. Aylık oran önce 12 ile çarpılır (Faiz!B64).
 7. `=72/B32` → 72 / 0,40 = 180 yıl. Doğrusu `=B87/(B32*B34)` → 1,80 yıl (Faiz!B91). Neden: oran hücrede kesir olarak saklanır (0,40), kural ise yüzde sayısını (40) ister. 100 ile çarpmak bir birim çevirmesidir ve bu sayı B34'te durur.
-8. `=TAKSİT_SAYISI(B32;0;-1;B86)` / `=NPER(B32,0,-1,B86)` → Python `math.log(2) / math.log(1 + r)` ya da `npf.nper(r, 0, -1, 2)`; ikisi de 2,06 verir (Faiz!B89). `=NOMİNAL(B65;B62)` / `=NOMINAL(B65,B62)` → `m * ((1 + e) ** (1 / m) - 1)`; e = 0,425761 ve m = 12 ile 0,36 verir (Faiz!B67). numpy-financial'da ETKİN ve NOMİNAL'in hazır karşılığı yoktur.
-9. A1'de 50.000, A2'de 0,30, A3'te 2. `=BD(A2;A3;0;-A1)` / İngilizce `=PV(A2,A3,0,-A1)` → 29.585,80 TL. Sağlama: `=A1/(1+A2)^A3` aynı sonucu verir; 29.585,80 × 1,69 = 50.000. Neden: BD, bileşik faizi tersten işletir. Gelecek tutar eksi girildiği için sonuç artı döner.
+8. `=NPER(B32,0,-1,B86)` → Python `math.log(2) / math.log(1 + r)` ya da `npf.nper(r, 0, -1, 2)`; ikisi de 2,06 verir (Faiz!B89). `=NOMINAL(B65,B62)` → `m * ((1 + e) ** (1 / m) - 1)`; e = 0,425761 ve m = 12 ile 0,36 verir (Faiz!B67). numpy-financial'da `EFFECT` ve `NOMINAL`'in hazır karşılığı yoktur.
+9. A1'de 50.000, A2'de 0,30, A3'te 2. `=PV(A2,A3,0,-A1)` → 29.585,80 TL. Sağlama: `=A1/(1+A2)^A3` aynı sonucu verir; 29.585,80 × 1,69 = 50.000. Neden: PV, bileşik faizi tersten işletir. Gelecek tutar eksi girildiği için sonuç artı döner.
 10. Örnek cevap: "Manşet aynı ama yıllık bileşik teklif yılda %40, aylık bileşik teklif yılda %48,21 kazandırır (Faiz!D50 ve D53); oranın bir yıl sabit kaldığı ve vergi olmadığı varsayımıyla aylık bileşik olan daha çok kazandırır." Cümlede ölçü (yıllık etkin), sayı ve varsayım birlikte geçmektedir.
-11. A1'de 0,30. `=ÜS(A1)-1` / İngilizce `=EXP(A1)-1` → %34,99. Python: `math.exp(0.30) - 1`. Neden: sürekli bileşik, bileşiklenme sıklığının sınırıdır. Yıllık nominal %30'un hiçbir sıklıkta geçemeyeceği yıllık etkin oran budur.
+11. A1'de 0,30. `=EXP(A1)-1` → %34,99. Python: `math.exp(0.30) - 1`. Neden: sürekli bileşik, bileşiklenme sıklığının sınırıdır. Yıllık nominal %30'un hiçbir sıklıkta geçemeyeceği yıllık etkin oran budur.
